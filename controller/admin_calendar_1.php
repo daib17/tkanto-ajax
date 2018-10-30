@@ -41,5 +41,6 @@ if (isset($_POST['changeMonth'])) {
 $monthName = date("F", strtotime($date));
 $year = date("Y", strtotime($date));
 
-// Generate calendar table
-$calendarTable = getAdminMonthlyCalendar($db, $date, $selDate);
+// Set cookies
+setcookie("date", $date);
+setcookie("selDate", $selDate);

@@ -1,3 +1,4 @@
+<script type="text/javascript" src="js/admin_ajax.js"></script>
 <div class="container main-container">
     <ul class="nav nav-tabs">
         <li class="nav-item">
@@ -32,22 +33,8 @@
                     </form>
                 </thead>
             </table>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th class="day-label">Mon</th>
-                        <th class="day-label">Tue</th>
-                        <th class="day-label">Wed</th>
-                        <th class="day-label">Thu</th>
-                        <th class="day-label">Fri</th>
-                        <th class="day-label">Sat</th>
-                        <th class="day-label">Sun</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?= $calendarTable ?>
-                </tbody>
-            </table>
+            <script>getAdminCalendarMonth();</script>
+            <span id="output"></span>
         </div>
     </div>
 </div>

@@ -49,6 +49,8 @@ CREATE TABLE `student` (
 
 --
 -- Insert dummy students
+-- Admin pass: admin
+-- Users paas: 123456
 --
 INSERT INTO `student` (`id`, `firstname`, `lastname`, `username`, `email`, `phone`, `password`, `status`, `updated`) VALUES
 (1, 'niko', 'kanto', 'admin', 'niko@kanto.com', 654987345, 'wRmFwpc.GvGsk', 2, '2018-10-28 10:47:57'),

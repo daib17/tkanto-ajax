@@ -1,3 +1,4 @@
+<script type="text/javascript" src="js/admin_ajax.js"></script>
 <div class="container main-container">
     <ul class="nav nav-tabs">
         <li class="nav-item">
@@ -29,18 +30,13 @@
             <?= $select ?>
         </div>
 
-        <table class="table table-bordered table-selectable">
-            <thead>
-                <tr>
-                    <th scope="col" colspan="2">Name</th>
-                    <th scope="col">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?= $studentTable ?>
-            </tbody>
-        </table>
-        <?= $pagination ?>
+        <script>getAdminStudentList();</script>
+        <span id="studentList"></span>
+
+        <script>getAdminStudentPagination();</script>
+        <span id="pagination"></span>
+
+        <!-- <?= $pagination ?> -->
         <div class="<?= $infoMsg ?>">
             <div class="alert alert-info" role="alert">
                 Select student to edit details.

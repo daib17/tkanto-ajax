@@ -24,8 +24,8 @@ if (isset($_POST['button']) && $_POST['button'] == "cancel") {
     $cancelButton = "";
 }
 
-// Generate student table
-$bookingsTable = getBookingsList($db, $student, $page, $selDate, $selTime);
-
-// Page navigation
-$pagination = createPageNavigation($db, $student, $page);
+// Set cookies
+setcookie("student", $student);
+setcookie("page", $page);
+setcookie("selDate", $selDate);
+setcookie("selTime", $selTime);

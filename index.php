@@ -20,16 +20,13 @@ switch ($route) {
     case "":
     case "login":
         $title = "Tk | Login";
-        // TODO
-        // Validate username and password
-        // If login ok view/student_cal.php or view/admin_students.php
         $controller = ["controller/login.php"];
-        $view = ["incl/header.php", "view/login.php"];
+        $view = ["incl/navbar_login.php", "view/login.php", "incl/footer.php"];
         break;
     case "register":
         $title = "Tk | Register";
         $controller = ["controller/register.php"];
-        $view = ["incl/header.php", "view/register.php"];
+        $view = ["incl/navbar_login.php", "view/register.php", "incl/footer.php"];
         break;
     case "student_calendar":
         if (!($_SESSION["user"] ?? null)) {
@@ -38,7 +35,7 @@ switch ($route) {
         }
         $title = "Tk | Student";
         $controller = ["controller/student_calendar.php"];
-        $view = ["incl/header_logout.php", "view/student_calendar.php"];
+        $view = ["incl/navbar_logout.php", "view/student_calendar.php", "incl/footer_loading.php"];
         break;
     case "student_bookings":
         if (!($_SESSION["user"] ?? null)) {
@@ -47,7 +44,7 @@ switch ($route) {
         }
         $title = "Tk | Student";
         $controller = ["controller/student_bookings.php"];
-        $view = ["incl/header_logout.php", "view/student_bookings.php"];
+        $view = ["incl/navbar_logout.php", "view/student_bookings.php", "incl/footer_loading.php"];
         break;
     case "student_recent":
         if (!($_SESSION["user"] ?? null)) {
@@ -56,7 +53,7 @@ switch ($route) {
         }
         $title = "Tk | Student";
         $controller = ["controller/student_recent.php"];
-        $view = ["incl/header_logout.php", "view/student_recent.php"];
+        $view = ["incl/navbar_logout.php", "view/student_recent.php", "incl/footer_loading.php"];
         break;
     case "admin_students_1":
         if (!$_SESSION["user"] || $_SESSION["user"] != "admin") {
@@ -65,7 +62,7 @@ switch ($route) {
         }
         $title = "Tk | Admin";
         $controller = ["controller/admin_students_1.php"];
-        $view = ["incl/header_logout.php", "view/admin_students_1.php"];
+        $view = ["incl/navbar_logout.php", "view/admin_students_1.php", "incl/footer_loading.php"];
         break;
     case "admin_students_2":
         if (!$_SESSION["user"] || $_SESSION["user"] != "admin") {
@@ -74,7 +71,7 @@ switch ($route) {
         }
         $title = "Tk | Admin";
         $controller = ["controller/admin_students_2.php"];
-        $view = ["incl/header_logout.php", "view/admin_students_2.php"];
+        $view = ["incl/navbar_logout.php", "view/admin_students_2.php", "incl/footer_loading.php"];
         break;
     case "admin_recent":
         if (!$_SESSION["user"] || $_SESSION["user"] != "admin") {
@@ -83,7 +80,7 @@ switch ($route) {
         }
         $title = "Tk | Admin";
         $controller = ["controller/admin_recent.php"];
-        $view = ["incl/header_logout.php", "view/admin_recent.php"];
+        $view = ["incl/navbar_logout.php", "view/admin_recent.php", "incl/footer_loading.php"];
         break;
     case "admin_calendar_1":
         if (!$_SESSION["user"] || $_SESSION["user"] != "admin") {
@@ -92,7 +89,7 @@ switch ($route) {
         }
         $title = "Tk | Admin";
         $controller = ["controller/admin_calendar_1.php"];
-        $view = ["incl/header_logout.php", "view/admin_calendar_1.php"];
+        $view = ["incl/navbar_logout.php", "view/admin_calendar_1.php", "incl/footer_loading.php"];
         break;
     case "admin_calendar_2":
         if (!$_SESSION["user"] || $_SESSION["user"] != "admin") {
@@ -101,7 +98,7 @@ switch ($route) {
         }
         $title = "Tk | Admin";
         $controller = ["controller/admin_calendar_2.php"];
-        $view = ["incl/header_logout.php", "view/admin_calendar_2.php"];
+        $view = ["incl/navbar_logout.php", "view/admin_calendar_2.php", "incl/footer_loading.php"];
         break;
     case "admin_stats":
         if (!$_SESSION["user"] || $_SESSION["user"] != "admin") {
@@ -110,14 +107,16 @@ switch ($route) {
         }
         $title = "Tk | Admin";
         $controller = ["controller/admin_stats.php"];
-        $view = ["incl/header_logout.php", "view/admin_stats.php"];
+        $view = ["incl/navbar_logout.php", "view/admin_stats.php", "incl/footer_loading.php"];
         break;
     case "pass_recovery":
         $title = "Tk | Recovery";
         $controller = ["controller/pass_recovery.php"];
-        $view = ["incl/header.php", "view/pass_recovery.php"];
+        $view = ["incl/header.php", "view/pass_recovery.php", "incl/footer.php"];
         break;
 }
+
+require "incl/header.php";
 
 // Controller
 foreach ($controller as $value) {
@@ -128,4 +127,3 @@ foreach ($controller as $value) {
 foreach ($view as $value) {
     require $value;
 }
-require "incl/footer.php";

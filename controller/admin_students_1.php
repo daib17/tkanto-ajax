@@ -28,8 +28,8 @@ if (isset($_POST['search'])) {
 // Spinner
 $select = getSpinnerFilter($filter, $search);
 
-// Generate student table
-$studentTable = getStudentListAsTable($db, $filter, $page, $studentID, $search);
-
-// pagination
-$pagination = getPagination($db, $filter, $page, $search);
+// Set cookies
+setcookie("filter", $filter);
+setcookie("page", $page);
+setcookie("selectedID", $studentID);
+setcookie("search", $search);

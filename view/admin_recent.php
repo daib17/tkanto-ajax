@@ -1,3 +1,4 @@
+<script type="text/javascript" src="js/admin_ajax.js"></script>
 <div class="container main-container">
     <ul class="nav nav-tabs">
         <li class="nav-item">
@@ -14,18 +15,7 @@
         </li>
     </ul>
     <div class="container main-container-inner">
-        <table class="table table-bordered table-selectable">
-            <thead>
-                <tr>
-                    <th scope="col">Student</th>
-                    <th scope="col">Action</th>
-                    <th scope="col">Booking</th>
-                    <th scope="col">Log</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?= $logTable ?>
-            </tbody>
-        </table>
+        <script>getAdminRecent();</script>
+        <span id="log"></span>
     </div>
 </div>

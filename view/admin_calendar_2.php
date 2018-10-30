@@ -1,3 +1,4 @@
+<script type="text/javascript" src="js/admin_ajax.js"></script>
 <div class="container main-container">
     <ul class="nav nav-tabs">
         <li class="nav-item">
@@ -21,10 +22,16 @@
         <?php endif; ?>
         <div class="spinner">
             <div class="float-left w-25 mb-4">
-                <?= $timeSpinner ?>
+                <script>getAdminTimeSpin();</script>
+                <select id='timeSpinner' class='form-control'>
+                    <option value=""></option>
+                </select>
             </div>
             <div class="float-right w-50 mb-4 <?= $hideSpinner ?>">
-                <?= $studentSpinner ?>
+                <script>getAdminStudentSpin();</script>
+                <select id='studentSpinner' class='form-control'>
+                    <option value=""></option>
+                </select>
             </div>
             <div class="float-right mb-4">
                 <form method="POST">
@@ -53,10 +60,35 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <?= $hoursTable ?>
-                    </tbody>
                 </table>
+
+                <script>getAdminCalendarDay();</script>
+                <div id="output">
+                    <table class='table table-bordered'>
+                        <body>
+                            <?php
+                            $id = 0;
+                            for ($row = 0; $row < 7; $row++) {
+                                ?>
+                                <tr>
+                                    <?php
+                                    for ($id = $row * 4; $id < ($row * 4) + 4; $id++) {
+                                        // Time label
+                                        $hour = (int)($id / 2) + 8;
+                                        $half = ($id % 2 == 1) ? ":30" : ":00";
+                                        $time = $hour . $half;
+                                        ?>
+                                        <td><input type='submit' class='button empty' name='hourLabel' value='<?= $time ?>' /></td>
+                                    <?php } ?>
+                                </tr>
+                                <?php
+                            }
+                            ?>
+                        </body>
+                    </table>
+                </div>
+                <!-- <span id="output"></span> -->
+
                 <div>
                     <button class="btn btn-lg btn-info btn-block font-weight-bold mt-5" type="submit" name="copyBtn" value="copy">Copy open hours to next day</button>
                 </div>

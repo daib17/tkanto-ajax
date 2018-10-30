@@ -1,4 +1,4 @@
-<script type="text/javascript" src="js/query.js"></script>
+<script type="text/javascript" src="js/admin_ajax.js"></script>
 <div class="main-container">
     <ul class="nav nav-tabs">
         <li class="nav-item">

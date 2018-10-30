@@ -1,3 +1,4 @@
+<script type="text/javascript" src="js/student_ajax.js"></script>
 <div class="container main-container">
     <ul class="nav nav-tabs">
         <li class="nav-item">
@@ -33,25 +34,8 @@
                     </form>
                 </thead>
             </table>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th class="day-label">Mon</th>
-                        <th class="day-label">Tue</th>
-                        <th class="day-label">Wed</th>
-                        <th class="day-label">Thu</th>
-                        <th class="day-label">Fri</th>
-                        <th class="day-label">Sat</th>
-                        <th class="day-label">Sun</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?= $calendarTable ?>
-                </tbody>
-            </table>
-            <div>
-                (*) Dates with available times
-            </div>
+            <script>getStudentCalendarMonth();</script>
+            <span id="calendar-month"></span>
         </div>
         <div class="student-day <?= $hidePanelB ?>">
             <h5 class="mb-4">Select a time to book or cancel</h5>
@@ -60,19 +44,15 @@
                     <?= $exception ?>
                 </div>
             <?php endif; ?>
-            <table class="table table-bordered">
+            <table class="table table-bordered mb-0">
                 <thead>
                     <tr>
                         <th scope="col" colspan="2"><?= $daySel ?> <?= $monthSel ?> <?= $yearSel ?></th>
                     </tr>
                 </thead>
-                <tbody>
-                    <?= $dayTable ?>
-                </tbody>
             </table>
-            <div>
-                (*) 30 min classes
-            </div>
+            <script>getStudentCalendarDay();</script>
+            <span id="calendar-day"></span>
         </div>
 
         <form class="<?= $hidePanelB ?>" method="POST">

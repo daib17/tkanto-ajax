@@ -50,20 +50,19 @@ if (substr($bookedBy, -1) == "*") {
 
 // Clicking on admin slot opens spinner with list of students
 if ($bookedBy == "admin") {
-    $studentSpinner = getStudentSpinner($db);
     $hideSpinner = "";
 } else {
-    $studentSpinner = "";
     $hideSpinner = "hidden";
 }
 
-// Generate array (0 to 27) of Hour objects for selected date from DB
-$hourArr = generateHourArrayFromDB($db, $date);
+// Set cookies
+setcookie("date", $date);
+setcookie("hourStr", $hourStr);
 
 // Copy template to next day?
 if (isset($_POST['copyBtn'])) {
     try {
-        copyTemplate($db, $date, $hourArr);
+        copyTemplate($db, $date);
     } catch(Exception $ex) {
         $exception = $ex->getMessage();
     }
@@ -75,7 +74,7 @@ if (isset($_GET['spinTime'])) {
     if (is_numeric($spin) && in_array($spin, [0, 30, 60])) {
         $student = "admin";
         try {
-            updateCalendarDB($db, $hourArr, $date, $student, $hourStr, $spin);
+            updateCalendarDB($db, $date, $student, $hourStr, $spin);
         } catch(Exception $ex) {
             $exception = "Database operation failed.";
         }
@@ -109,9 +108,3 @@ if (isset($_POST['clearBtn'])) {
         $exception = $ex->getMessage();
     }
 }
-
-// Get spinner for the selected hour
-$timeSpinner = getSpinnerForSelectedHour($db, $hourArr, $hourStr);
-
-// Get table
-$hoursTable = getHoursTable($db, $date, $hourArr, $hourStr);

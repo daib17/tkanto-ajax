@@ -1,114 +1,6 @@
 <?php
+require(__DIR__ . "/classes/Hour.php");
 const ITEMS_PAGE = 5;   // Number of students per page
-
-/**
-* Generate monthly calendar for admin.
-*
-* @param object $db database
-* @param string $date actual (day)/month/year to show (day irrelevant here)
-* @param string $selDate previously selected day
-*
-* @return string table
-*/
-function getAdminMonthlyCalendar($db, $date, $selDate)
-{
-    // This is the month/year to be show in the calendar
-    // $day = date("j", strtotime($date));
-    $month = date("n", strtotime($date));
-    $year = date("Y", strtotime($date));
-
-    // Day, month and year from a previously selected date
-    $selDay = date("j", strtotime($selDate));
-    $selMonth = date("n", strtotime($selDate));
-    $selYear = date("Y", strtotime($selDate));
-
-    // Today
-    $dayToday = date("j");
-    $monthToday = date("n");
-    $yearToday = date("Y");
-
-    // Get number of days in month
-    $numDays = cal_days_in_month(CAL_GREGORIAN, $month, $year);
-    $table = "";
-    // Get day of the week for the 1st of month/year
-    $dayOne = date('w', strtotime($year . "-" . $month . "-" . "1"));
-
-    // Get all entry for given month
-    $dateFrom = $year . "-" . $month . "-01";
-    $dateTo = $year . "-" . $month . "-" . $numDays;
-    $sql = "SELECT * FROM calendar WHERE date BETWEEN ? AND ? AND cancelby IS NULL;";
-    $res = $db->executeFetchAll($sql, [$dateFrom, $dateTo]);
-
-    // Get free/booked hours for each day
-    $free = [];
-    $booked = [];
-    for ($i = 0; $i < $numDays + 1; $i++) {
-        $free[] = 0;
-        $booked[] = 0;
-    }
-
-    foreach ($res as $aDay) {
-        $dayNum = (int)substr($aDay->date, -2);
-        if ($aDay->student == "admin" && $aDay->duration != 0) {
-            $free[$dayNum]++;
-        } elseif ($aDay->student != "admin" && $aDay->duration != 0) {
-            $booked[$dayNum]++;
-        }
-    }
-
-    // Empty cells before day one
-    $emptyCells = $dayOne == 0 ? 6 : $dayOne - 1;
-    for ($i = 1; $i < $emptyCells + 1; $i++) {
-        if ($i == 1) {
-            $table .= "<tr>";
-        }
-        $table .= "<td><input type='submit' class='button' name='day' value='' disabled /></td>";
-    }
-
-    // Cells for every day of the month
-    for ($i = 1; $i < $numDays + 1; $i++) {
-        $weekDay = date('w', strtotime($year . "-" . $month . "-" . $i));
-        if ($weekDay == 1) {
-            $table .= "<tr>";
-        }
-        $selector = "";
-        if ($i == $selDay && $month == $selMonth && $year == $selYear) {
-            $selector .= "selected ";
-        }
-        if ($weekDay == 6 || $weekDay == 0) {
-            $selector .= "weekend";
-        } else {
-            $selector .= "empty";
-        }
-
-        if ($i == $dayToday && $month == $monthToday
-        && $year = $yearToday) {
-            $selector .= " bold";
-        }
-        $date = date('Y-m-d', strtotime($year . "-" . $month . "-" . $i));
-        $freeEmpty = ($free[$i] == 0) ? "free-empty" : "";
-        $bookedEmpty = ($booked[$i] == 0) ? "booked-empty" : "";
-
-        $table .= "<td><form method='POST'><div class='day-label'><input type='hidden' name='route' value='admin_calendar_2'>
-        <input type='hidden' name='selDate' value='{$date}'><input type='submit' class='button {$selector}' name='day' value={$i}><div class='free-mini {$freeEmpty}'>{$free[$i]}</div><div class='booked {$bookedEmpty}'>{$booked[$i]}</div></div></form></td>";
-        if ($weekDay == 0) {
-            $table .= "</tr>";
-        }
-    }
-
-    // Empty cells after last day of the month
-    $weekDay = date('w', strtotime($year . "-" . $month . "-" . $numDays));
-    if ($weekDay != 0) {
-        for ($i = $weekDay; $i < 7; $i++) {
-            $table .= "<td><input type='submit' class='button' name='day' value='' disabled /></td>";
-        }
-    }
-
-    $table .= "</tr>";
-    return $table;
-}
-
-
 
 /**
 *   Get students from database
@@ -150,89 +42,6 @@ function doSearch($db, $search)
     return $res;
 }
 
-/**
-*
-*/
-function getStudentListAsTable($db, $filterId = 3, $page, $selectedID, $search)
-{
-    $statusStr = ["Disabled", "Pending", "Active"];
-    if ($search != "") {
-        $res = doSearch($db, $search);
-        $searchInput = "<input type='hidden' name='search' value='{$search}' />";
-    } else {
-        $res = getStudentsByStatus($db, $filterId);
-        $searchInput = "";
-    }
-
-    $table = "";
-    if ($res != null && count($res) > 0) {
-        $firstID = ($page - 1) * ITEMS_PAGE; // id for first element to draw
-        $lastID = $firstID + ITEMS_PAGE;
-        for ($id = $firstID; $id < $lastID; $id++) {
-            $table .= "<tr>";
-            if ($id < count($res)) {
-                $name = $res[$id]->firstname . "&nbsp;" . $res[$id]->lastname;
-                $studentID = $res[$id]->id;
-                if ($studentID == $selectedID) {
-                    $selected = " selected";
-                } else {
-                    $selected = "";
-                }
-
-                $table .= "<td colspan=2><form method='POST'><input type='hidden' name='route' value='admin_students_1'>{$searchInput}<input type='submit' class='{$selected}' name='name' value='{$name}'><input type='hidden' name='studentID' value={$studentID} /><input type='hidden' name='filter' value={$filterId} /><input type='hidden' name='page' value={$page} /></form></td>";
-                $table .= "<td>" . $statusStr[$res[$id]->status] . "</td>";
-            } else {
-                $table .= "<td colspan=2>&nbsp;</td>";
-                $table .= "<td><div class='empty'>Empty</div></td>";
-            }
-            $table .= "</tr>";
-        }
-    } else {
-        $table = "";
-        $table .= "<tr>";
-        $table .= "<td colspan=3 class='no-found-text'>" . "No students found in database." . "</td>";
-        $table .= "</tr>";
-    }
-
-    return $table;
-}
-
-
-
-/**
-*
-*/
-function getPagination($db, $filterId, $actualPage, $search)
-{
-    if ($search != "") {
-        $res = doSearch($db, $search);
-        $searchInput = "<input type='hidden' name='search' value='{$search}' />";
-    } else {
-        $res = getStudentsByStatus($db, $filterId);
-        $searchInput = "";
-    }
-
-    if ($res == null || count($res) < ITEMS_PAGE + 1) {
-        return "";
-    }
-
-    $pages = ceil((count($res) / ITEMS_PAGE));
-    // Pagination
-    $table = "";
-    $table .= "<nav>";
-    $table .= "<ul class='pagination justify-content-center'>";
-
-    for ($id = 1; $id < $pages + 1; $id++) {
-        $active = $id == $actualPage ? "active" : "";
-        $table .= "<form method='POST'><input type='hidden' name='route' value='admin_students_1'>{$searchInput}<input type='hidden' name='filter' value={$filterId}/><li class='page-item {$active}'><input type='submit' class='page-link' name='page' value={$id}></li></form>";
-    }
-
-    $table .= "</ul>";
-    $table .= "</nav>";
-    return $table;
-}
-
-
 
 /**
 *
@@ -258,9 +67,8 @@ function getSpinnerFilter($status, $search) {
 }
 
 
-
 /**
-*
+* Spinner for Admin - Students - Edit details form
 */
 function getSpinnerStatus($status) {
     $status;    // status 0 does not exist in panel B
@@ -279,14 +87,11 @@ function getSpinnerStatus($status) {
 }
 
 
-
 /**
 * Get hours from database for date and convert to array.
 * Array with length 28 represents hours between 8 and 21:30
-* Each array cell will contain the username that booked the time or
-* admin if available.
 *
-* @return array contains student's usernames for booked time.
+* @return array of Hour objects.
 */
 function generateHourArrayFromDB($db, $date) {
     $hourArr = [];
@@ -312,170 +117,16 @@ function generateHourArrayFromDB($db, $date) {
 }
 
 
-
-/**
-* ADMIN - Planning
-* Create dynamic spinner for selected date and hour
-*
-* @param db database
-* @param array $arr array [0, 27] of Hour objects
-* @param string hourStr selected "13:30"
-*
-* @return string html code for spinner
-*/
-function getSpinnerForSelectedHour($db, $arr, $hourStr) {
-    // Convert string time to integer
-    if ($hourStr != "") {
-        $str = explode(":", $hourStr);
-        $time = (int)$str[0] * 100 + (int)$str[1];
-        // Get id in array for given hour
-        $id = (((int)($time / 100)) - 8) * 2;
-        if ($time % 100 != 0) {
-            $id++;
-        }
-    }
-
-    // Return if no hour has been selected yet or no admin time
-    if ($hourStr == "") {
-        $spinHTML = "<select id='timeSpinner' class='form-control' disabled>";
-        $spinHTML .= "<option value='0'>0</option>";
-        $spinHTML .= "</select>";
-        return $spinHTML;
-    }
-
-    // Calculate id in array for time in db (800 is 0, 2130 is 27)
-    $id = (((int)($time / 100)) - 8) * 2;
-    if ($time % 100 != 0) {
-        $id++;
-    }
-
-    $duration = $arr[$id]->getDuration();
-    $student = $arr[$id]->getStudent();
-
-    // Only admin and available hours are changeable
-    if ($student != "admin" && $student != "") {
-        $spinHTML = "<select id='timeSpinner' class='form-control' disabled>";
-        $spinHTML .= "<option value=''>{$duration}</option>";
-        $spinHTML .= "</select>";
-        return $spinHTML;
-    }
-
-    $spinHTML = "<select id='timeSpinner' class='form-control'>";
-    if ($duration == 0) {
-        $spinHTML .= "<option value='0' selected>0</option>";
-    } else {
-        $spinHTML .= "<option value='0'>0</option>";
-    }
-
-    if ($duration == 30 ) {
-        $spinHTML .= "<option value='30' selected>30</option>";
-    } else {
-        $spinHTML .= "<option value='30'>30</option>";
-    }
-    // Check if next slot is available
-    if ($duration == 60) {
-        $spinHTML .= "<option value='60' selected>60</option>";
-    } elseif ($student == "admin") {
-
-    }
-    if ($id < 27) {
-        if ($arr[$id + 1]->getDuration() == -1 || (
-            $arr[$id + 1]->getStudent() == "admin" &&
-            $arr[$id + 1]->getDuration() == 30
-        )) {
-            $spinHTML .= "<option value='60'>60</option>";
-        }
-    }
-
-    $spinHTML .= "</select>";
-    return $spinHTML;
-}
-
-
-
-/**
-* Create spinner with list of students.
-
-*/
-function getStudentSpinner($db) {
-    // Get all active students from database
-    $sql = "SELECT * FROM student WHERE status LIKE ? AND username != ? ORDER BY lastname, firstname;";
-    $res = $db->executeFetchAll($sql, [2, "admin"]);
-    $spinHTML = "<select id='studentSpinner' class='form-control'>";
-    $spinHTML .= "<option value='noStudent'>Select student</option>";
-    foreach ($res as $row) {
-        $spinHTML .= "<option value='{$row->username}'>{$row->firstname} {$row->lastname}</option>";
-    }
-    $spinHTML .= "</select>";
-    return $spinHTML;
-}
-
-
-
-/**
-* Generate table from timetable with hours for given date.
-*
-* @return string html table
-*/
-function getHoursTable($db, $date, $hourArr, $hourLabel) {
-    $table = "";
-    $id = 0;
-    for ($row = 0; $row < 7; $row++) {
-        $table .= "<tr>";
-        for ($id = $row * 4; $id < ($row * 4) + 4; $id++) {
-            // Booked label showing only for bookings and canceled with flag
-            $bookedBy = "";
-            if (!$hourArr[$id]->getCancelBy() || $hourArr[$id]->getFlag() == 1) {
-                $bookedBy = $hourArr[$id]->getStudent();
-            }
-            // Time label
-            $hour = (int)($id / 2) + 8;
-            $half = ($id % 2 == 1) ? ":30" : ":00";
-            $time = $hour . $half;
-            // Background color for cell
-            $color = "";
-            if ($hourArr[$id]->getDuration() == 0) {
-                // Second 30 min slot for 60 min booking
-                if ($hourArr[$id]->getFlag() == 1) {
-                    $disabled = "flag-disabled";
-                } elseif ($hourArr[$id - 1]->getStudent() == "admin") {
-                    $disabled = "free-disabled";
-                } else {
-                    $disabled = "booked-disabled";
-                }
-                $table .= "<td><input id='h{$id}' type='submit' class='button {$disabled}' name='hourLabel' value='' /></td>";
-            } else {
-                if ($time == $hourLabel) {
-                    $color = "selected ";
-                }
-                if ($bookedBy == "admin") {
-                    $color .= "free";
-                } elseif ($bookedBy != "" && $hourArr[$id]->getFlag() == 1) {
-                    $bookedBy .= "*";
-                    $color .= "flag";
-                } elseif ($bookedBy != "" && $hourArr[$id]->getFlag() == 0) {
-                    $color .= "booked";
-                } else {
-                    $color .= "empty";
-                }
-                $table .= "<td><input id='h{$id}' type='submit' class='button {$color}' name='hourLabel' value='{$time} {$bookedBy}' /></td>";
-            }
-        }
-        $table .= "</tr>";
-    }
-
-    return $table;
-}
-
-
-
 /**
 * Insert or update calendar database with new value from spinner.
 *
 * @return array updated $hoursArray
 */
-function updateCalendarDB($db, $arr, $date, $student, $hourStr, $spin)
+function updateCalendarDB($db, $date, $student, $hourStr, $spin)
 {
+    // Array (0 to 27) of Hour objects for selected date from DB
+    $arr = generateHourArrayFromDB($db, $date);
+
     // Convert hour "11:30" to integer 1130
     $val = explode(":", $hourStr);
     $time = $val[0] * 100 + $val[1];
@@ -676,8 +327,11 @@ function clearFlag($db, $date, $hourStr) {
 /**
 * Copy hours template
 */
-function copyTemplate($db, $date, $arr)
+function copyTemplate($db, $date)
 {
+    // Array (0 to 27) of Hour objects for selected date from DB
+    $arr = generateHourArrayFromDB($db, $date);
+
     try {
         $db->beginTransaction();
         // Calculate date for one day later
@@ -722,49 +376,4 @@ function copyTemplate($db, $date, $arr)
         $db->rollBack();
         throw new Exception("Copy template operation failed.");
     }
-}
-
-
-
-/**
-*
-*/
-function getRecentActivity($db) {
-    $sql = "(SELECT *, bookdate AS d, 'book' AS action FROM calendar WHERE student != 'admin' AND duration > ?) UNION ALL (SELECT *, canceldate AS d, 'cancel' AS action FROM calendar WHERE student != 'admin' AND duration > ?) ORDER BY d DESC LIMIT 15;";
-    $res = $db->executeFetchAll($sql, [0, 0]);
-    $table = "";
-    // Empty log
-    if (!$res) {
-        $table .= "<tr>";
-        $table .= "<td colspan=4 class='empty-cell'>Log is empty.</td>";
-        $table .= "</tr>";
-        return $table;
-    }
-
-    foreach ($res as $row) {
-        $table .= "<tr>";
-        // From
-        $from = sprintf("%04d", $row->time);
-        $from = substr_replace($from, ":", 2, 0);
-        $from = ltrim($from, "0");
-        $timeLabel = $from;
-        // Format dates
-        $date = date('j M', strtotime($row->date));
-        // Entries with no cancel date get null 'd' column after select
-        if (!$row->d) {
-            continue;
-        }
-
-        $action = ($row->action == "cancel") ? "cancel (" . $row->cancelby . ")" : "book";
-        $booking =  $date . " (" . $timeLabel . ")";
-        $log = date('j M H:i', strtotime($row->d));
-
-        $table .= "<td class='text'>$row->student</td>";
-        $table .= "<td class='text'>$action</td>";
-        $table .= "<td class='text'>$booking</td>";
-        $table .= "<td class='text'>$log</td>";
-        $table .= "</tr>";
-    }
-
-    return $table;
 }

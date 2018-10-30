@@ -1,3 +1,4 @@
+<script type="text/javascript" src="js/student_ajax.js"></script>
 <div class="container main-container">
     <ul class="nav nav-tabs">
         <li class="nav-item">
@@ -13,19 +14,11 @@
 
     <div class="container main-container-inner">
         <h5 class="mb-4">Select a date to cancel</h5>
-        <table class="table table-bordered table-selectable">
-            <thead>
-                <tr>
-                    <th scope="col" colspan="2">Date</th>
-                    <th scope="col">Time</th>
-                    <th scope="col">Duration</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?= $bookingsTable ?>
-            </tbody>
-        </table>
-        <?= $pagination ?>
+        <script>getStudentBookings();</script>
+        <span id="bookings"></span>
+
+        <script>getStudentBookingsPagination();</script>
+        <span id="pagination"></span>
 
         <form class="top-buffer" method="POST">
             <input type='hidden' name='route' value='student_bookings'>

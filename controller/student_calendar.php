@@ -97,8 +97,11 @@ if (isset($_POST['changeMonth'])) {
 $monthName = date("F", strtotime($date));
 $year = date("Y", strtotime($date));
 
-$calendarTable = getMonthCalendar($db, $date, $selDate, $student);
-$dayTable = getDayCalendar($db, $student, $selDate, $selHour);
+// Set cookies
+setcookie("date", $date);
+setcookie("selDate", $selDate);
+setcookie("student", $student);
+setcookie("selHour", $selHour);
 
 // Extract day, month and year from selected day for day table header
 $daySel = date("j", strtotime($selDate));
